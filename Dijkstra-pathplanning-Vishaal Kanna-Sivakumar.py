@@ -43,22 +43,35 @@ def Move_dir(map, action, state, index):
 def New_node(map, OpenList, ClosedList, Goal_node_x, Goal_node_y, index):
 	M = heapq.heappop(OpenList)
 	ClosedList.append(M)
-	Action_space = ((5, 0), (-5, 0), (0, 5), (0, -5), (5, 5), (-5, 5), (5, -5), (-5, -5))
+	Action_space = ((2, 0), (-2, 0), (0, 2), (0, -2), (2, 2), (-2, 2), (2, -2), (-2, -2))
 	for i in range(0,8):
-		map, new_node_x, new_node_y, C2C, index, t = Move_dir(map, Action_space[i], M[3],index)
+		map, new_node_x, new_node_y, C2C, index, t = Move_dir(map, Action_space[i], M[3], index)
 		if t==1:
 			new_node = (M[0]+C2C, index, M[1], (new_node_x, new_node_y))
 			heapq.heappush(OpenList, new_node)
 			if new_node_x == Goal_node_x and new_node_y == Goal_node_y:
-				return map, OpenList, ClosedList, 1
-	return map, OpenList, ClosedList, 0
+				ClosedList.append(new_node)
+				return map, OpenList, ClosedList, index, 1
+	return map, OpenList, ClosedList, index, 0
+
+def generate_path(lst, ClosedList, idx):
+	for i in range(0, len(ClosedList)):
+		if ClosedList[i][1] == idx:
+			idx = i
+			break
+	if ClosedList[idx][2] ==-1:
+		lst.append(ClosedList[idx][3])
+		return lst
+	else:
+		lst.append(ClosedList[idx][3])
+		generate_path(lst, ClosedList, ClosedList[idx][2])
 
 def main():
 	map = map_gen()
 	#plt.imshow(map)
 	# creating tuple with cost to come, index, parent node index=0 and coordinate values (x,y)
 	start_node = (0, 0, -1, (0, 0))
-	goal_node_x, goal_node_y = 395, 5
+	goal_node_x, goal_node_y = 200, 50
 	OpenList = [start_node]
 	ClosedList = []
 	heapq.heapify(OpenList)
@@ -67,18 +80,46 @@ def main():
 	map_color_b = np.zeros((250, 400))
 	map_color_g = np.zeros((250, 400))
 	map_color1 = np.zeros((250, 400,3))
+	index = 0
 
 	while len(OpenList) and not goal_reached:
-		map, OpenList, ClosedList, goal_reached = New_node(map, OpenList, ClosedList, goal_node_x, goal_node_y,0)
+		map, OpenList, ClosedList, index, goal_reached = New_node(map, OpenList, ClosedList, goal_node_x, goal_node_y,index)
+
+	print('States Explored')
+
+	for	i in range(0,len(ClosedList)):
+		map[ClosedList[i][3][1]][ClosedList[i][3][0]]=0.7
 		map_color = map
 		map_color_r[map_color == 0] = 1
-		map_color_b[map_color == 0.5] = 1
+		map_color_b[map_color == 0.7] = 1
 		map_color_g[map_color == 1] = 1
 		map_color1[:, :, 0] = map_color_r * 255
 		map_color1[:, :, 1] = map_color_b * 255
 		map_color1[:, :, 2] = map_color_g * 255
 		cv2.imshow("Map",map_color1)
 		cv2.waitKey(1)
+
+		lst = []
+		lst.append(ClosedList[len(ClosedList) - 1][3])
+		generate_path(lst, ClosedList, ClosedList[len(ClosedList) - 1][2])
+
+	map_color_r1 = np.zeros((250, 400))
+	map_color_b1 = np.zeros((250, 400))
+	map_color_g1 = np.zeros((250, 400))
+	map_color2 = np.zeros((250, 400,3))
+
+	for i in range(0, len(lst)):
+		map[lst[i][1]][lst[i][0]] = 0.2
+		map_color = map
+		map_color_r1[map_color == 0] = 1
+		map_color_b1[map_color == 0.2] = 1
+		map_color_g1[map_color == 1] = 1
+		map_color2[:, :, 0] = map_color_r1 * 0
+		map_color2[:, :, 1] = map_color_b1 * 255
+		map_color2[:, :, 2] = map_color_g1 * 255
+		cv2.imshow("Map", map_color2)
+		cv2.waitKey(0)
+
 
 if __name__ == '__main__':
 	main()
