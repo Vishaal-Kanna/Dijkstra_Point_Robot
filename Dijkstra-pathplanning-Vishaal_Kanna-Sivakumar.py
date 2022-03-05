@@ -63,6 +63,7 @@ def New_node(map, OpenList, ClosedList, Goal_node_x, Goal_node_y, index):
 
 		count = 0
 		if t==1:
+			#Using the map directly to check if the node is in the ClosedList by setting the map matrix node to -1 
 			#for j in range(0,len(ClosedList)):
 			#	if new_node_x == ClosedList[j][3][0] and new_node_y == ClosedList[j][3][1]:
 			#		count=count+1
