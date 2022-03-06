@@ -109,7 +109,7 @@ def main():
 			print("Coordinates entered are outside the map")
 		elif start_node_x==goal_node_x and start_node_y==goal_node_y:
 			print('Starting node and Goal node are same. Please enter different sets of matrices for each.')
-		elif map[250-start_node_y][400-start_node_x] == 10000 or map[250-goal_node_y][400-goal_node_x] == 10000:
+		elif map[250-start_node_y][start_node_x] == 10000 or map[250-goal_node_y][goal_node_x] == 10000:
 			print("Coordinates are inside the Obstacle")
 		else:
 			flag=0
@@ -173,3 +173,4 @@ def main():
 
 if __name__ == '__main__':
 	main()
+
